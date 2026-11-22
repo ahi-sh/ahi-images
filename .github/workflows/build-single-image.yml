@@ -17,7 +17,7 @@ on:
         required: true
         type: string
       base_image:
-        description: For rust and python, ghcr.io/iancleary/ahi-dev@sha256:... built in this run. Empty for dev.
+        description: For rust and python, ghcr.io/ahi-sh/ahi-dev@sha256:... built in this run. Empty for dev.
         required: false
         type: string
         default: ""

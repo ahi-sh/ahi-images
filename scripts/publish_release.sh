@@ -25,6 +25,7 @@ if [[ ! "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]; then
   exit 1
 fi
 
+registry=ghcr.io/ahi-sh
 images=(ahi-dev ahi-dev-rust ahi-dev-python)
 digests=("$DIGEST_AHI_DEV" "$DIGEST_AHI_DEV_RUST" "$DIGEST_AHI_DEV_PYTHON")
 for index in "${!images[@]}"; do
@@ -36,7 +37,7 @@ done
 
 if [[ -n "${AHI_IMAGES_RELEASE_PRINT:-}" ]]; then
   for index in "${!images[@]}"; do
-    image=ghcr.io/iancleary/${images[$index]}
+    image=$registry/${images[$index]}
     printf '%s\n' -t "${image}:${IMAGE_VERSION}" -t "${image}:latest" "${image}@${digests[$index]}"
   done
   printf 'git_tag=%s\n' "$GIT_TAG"
@@ -44,7 +45,7 @@ if [[ -n "${AHI_IMAGES_RELEASE_PRINT:-}" ]]; then
 fi
 
 for index in "${!images[@]}"; do
-  image=ghcr.io/iancleary/${images[$index]}
+  image=$registry/${images[$index]}
   docker buildx imagetools create \
     -t "${image}:${IMAGE_VERSION}" \
     -t "${image}:latest" \
@@ -68,9 +69,9 @@ ahi-dev ${IMAGE_VERSION}.
 
 Multi-arch (linux/amd64, linux/arm64) manifest lists, each also tagged :latest:
 
-- ghcr.io/iancleary/ahi-dev:${IMAGE_VERSION}
-- ghcr.io/iancleary/ahi-dev-rust:${IMAGE_VERSION}
-- ghcr.io/iancleary/ahi-dev-python:${IMAGE_VERSION}
+- ${registry}/ahi-dev:${IMAGE_VERSION}
+- ${registry}/ahi-dev-rust:${IMAGE_VERSION}
+- ${registry}/ahi-dev-python:${IMAGE_VERSION}
 
 :edge is unchanged by this release.
 

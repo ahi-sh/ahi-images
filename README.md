@@ -1,10 +1,10 @@
 # ahi-images
 
-Container images for the [`ahi`](https://github.com/iancleary/ahi) CLI. This repo owns
+Container images for the [`ahi`](https://github.com/ahi-sh/ahi) CLI. This repo owns
 the Containerfiles and the publish flow; the CLI only references the resulting image
-(default: `ghcr.io/iancleary/ahi-dev:latest`, overridable via flag, env, or
+(new organization default: `ghcr.io/ahi-sh/ahi-dev:latest`, overridable via flag, env, or
 `ahi.dev.yaml`). Design context for `ahi dev` and `ahi dev run` lives in
-[docs/DEV_CONTAINER.md](https://github.com/iancleary/ahi/blob/main/docs/DEV_CONTAINER.md)
+[the CLI guide](https://github.com/ahi-sh/ahi#ahi-dev)
 in the ahi repository.
 
 ## Images
@@ -14,9 +14,9 @@ it wants; the base stays small, and Node is deliberately absent.
 
 | Image | Path | Adds |
 |-------|------|------|
-| `ghcr.io/iancleary/ahi-dev` | `images/dev/` | Fedora, common CLI tools, zsh login shell with powerlevel10k, non-root `dev` user with passwordless sudo, the remapping entrypoint |
-| `ghcr.io/iancleary/ahi-dev-rust` | `images/rust/` | rustup with a pinned stable toolchain, clippy, rustfmt, gcc; `CARGO_TARGET_DIR=/work/target/dev` |
-| `ghcr.io/iancleary/ahi-dev-python` | `images/python/` | uv at a pinned version, one pinned CPython 3.14 in `/opt/python` |
+| `ghcr.io/ahi-sh/ahi-dev` | `images/dev/` | Fedora, common CLI tools, zsh login shell with powerlevel10k, non-root `dev` user with passwordless sudo, the remapping entrypoint |
+| `ghcr.io/ahi-sh/ahi-dev-rust` | `images/rust/` | rustup with a pinned stable toolchain, clippy, rustfmt, gcc; `CARGO_TARGET_DIR=/work/target/dev` |
+| `ghcr.io/ahi-sh/ahi-dev-python` | `images/python/` | uv at a pinned version, one pinned CPython 3.14 in `/opt/python` |
 
 `ahi-dev-rust` and `ahi-dev-python` are built `FROM` the `ahi-dev` manifest produced
 in the same publish run, by digest, so the three images of one tag share the same base.
@@ -24,7 +24,8 @@ in the same publish run, by digest, so the three images of one tag share the sam
 Pick a layer in the repository's `ahi.dev.yaml`:
 
 ```yaml
-image: ghcr.io/iancleary/ahi-dev-rust:latest
+version: 1
+image: ghcr.io/ahi-sh/ahi-dev-rust:latest
 ```
 
 ### Pinned versions
@@ -82,7 +83,7 @@ A host uid or gid of 0 is ignored, and a non-numeric value is refused.
 ```sh
 docker run --rm -it -v "$PWD:/work" -w /work \
   -e AHI_HOST_UID="$(id -u)" -e AHI_HOST_GID="$(id -g)" \
-  ghcr.io/iancleary/ahi-dev-rust:latest cargo test
+  ghcr.io/ahi-sh/ahi-dev-rust:latest cargo test
 ```
 
 The entrypoint passes argv and stdout through untouched and returns the command's
@@ -124,12 +125,12 @@ manifests succeeded; a failed build moves none of them.
 Each architecture builds on a native runner (amd64/arm64), is smoke-tested
 with the network disabled, pushed by digest, and verified against the smoked
 config. `ahi-dev` builds first; `ahi-dev-rust` and `ahi-dev-python` then build
-`FROM ghcr.io/iancleary/ahi-dev@<digest>` of that run. Manifest lists are
+`FROM ghcr.io/ahi-sh/ahi-dev@<digest>` of that run. Manifest lists are
 attested with `actions/attest-build-provenance` and signed with keyless cosign.
 
 ```sh
-cosign verify ghcr.io/iancleary/ahi-dev-rust:latest \
-  --certificate-identity-regexp 'https://github.com/iancleary/ahi-images/.github/workflows/.*' \
+cosign verify ghcr.io/ahi-sh/ahi-dev-rust:latest \
+  --certificate-identity-regexp '^https://github\.com/ahi-sh/ahi-images/\.github/workflows/(build-single-image|publish)\.yml@refs/heads/main$' \
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com'
 ```
 
@@ -137,7 +138,7 @@ GitHub creates each package as private the first time it is pushed. After
 the first successful run on `main`, set `ahi-dev`, `ahi-dev-rust`, and
 `ahi-dev-python` to public and connect them to this repository if they are not
 already linked. The child builds pull `ahi-dev` by digest with the workflow token,
-so they work while the package is still private.
+so they work while the package is still private. Transferring the Git repository does not redirect the old GHCR paths. Before shipping the new CLI default, publish a calver (`:edge` alone is insufficient), confirm anonymous manifest access for all three `:latest` tags on amd64 and arm64, and verify their signatures. Keep existing digest pins until their replacements have been independently verified.
 
 ## Layout
 
