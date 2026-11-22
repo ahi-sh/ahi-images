@@ -101,7 +101,7 @@ jobs:
     uses: ./.github/workflows/build-single-image.yml
     with:
       name: dev
-      image: ghcr.io/iancleary/ahi-dev
+      image: ghcr.io/ahi-sh/ahi-dev
       publish: ${{ needs.plan.outputs.publish }}
       image_version: ${{ needs.plan.outputs.image_version }}
       short_sha: ${{ needs.plan.outputs.short_sha }}
@@ -119,8 +119,8 @@ jobs:
     uses: ./.github/workflows/build-single-image.yml
     with:
       name: rust
-      image: ghcr.io/iancleary/ahi-dev-rust
-      base_image: ghcr.io/iancleary/ahi-dev@${{ needs.dev.outputs.digest }}
+      image: ghcr.io/ahi-sh/ahi-dev-rust
+      base_image: ghcr.io/ahi-sh/ahi-dev@${{ needs.dev.outputs.digest }}
       publish: ${{ needs.plan.outputs.publish }}
       image_version: ${{ needs.plan.outputs.image_version }}
       short_sha: ${{ needs.plan.outputs.short_sha }}
@@ -138,8 +138,8 @@ jobs:
     uses: ./.github/workflows/build-single-image.yml
     with:
       name: python
-      image: ghcr.io/iancleary/ahi-dev-python
-      base_image: ghcr.io/iancleary/ahi-dev@${{ needs.dev.outputs.digest }}
+      image: ghcr.io/ahi-sh/ahi-dev-python
+      base_image: ghcr.io/ahi-sh/ahi-dev@${{ needs.dev.outputs.digest }}
       publish: ${{ needs.plan.outputs.publish }}
       image_version: ${{ needs.plan.outputs.image_version }}
       short_sha: ${{ needs.plan.outputs.short_sha }}

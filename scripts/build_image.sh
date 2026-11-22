@@ -4,7 +4,7 @@
 # Continuous integration loads ahi-images-ci-<name>:smoke and does not push.
 # The push script publishes that loaded image by digest after the smoke test.
 # rust and python build FROM the base given by AHI_IMAGES_BASE_IMAGE: in CI
-# the ghcr.io/iancleary/ahi-dev manifest built in the same run, by digest;
+# the ghcr.io/ahi-sh/ahi-dev manifest built in the same run, by digest;
 # locally ahi-dev:local by default.
 # The docker exporter's unpack option conflicts with rewrite-timestamp, so a
 # loaded image is produced by exporting a tarball and loading that tarball.
